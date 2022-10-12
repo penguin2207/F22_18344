@@ -23,6 +23,14 @@ int incLRU(unsigned long long sb) {
     return 0;
 }
 
+int clearPLRUS(unsigned long long sb){
+  for (int i = 0; i < (int)g_lines; ++i) {
+        if (g_cache[sb][i].valid)
+            g_cache[sb][i].bitPLRU = false;
+  }
+  return 0;
+}
+
 
 
 void mhLoad(void *addr, size_t size, void *instAddr){
@@ -36,7 +44,7 @@ void mhStore(void *addr, size_t size, void *instAddr){
 }
 
 
-
+// Policy Key: 0 -> Random, 1 -> LRU, 2 -> bit-pLRU
 int cacheFunc(unsigned long long data) {
     // Get set bits, offset bits, tag bits
     unsigned long long tagBits =
@@ -46,7 +54,9 @@ int cacheFunc(unsigned long long data) {
     unsigned long long offBits = data & g_offMask;
     // Initialize index of lru block and empty block
     int lruInd = 0;
+    int plruInd = -1;
     int emptyBlockInd = -1;
+    int plrus = 0;
     // Check for hit and find lru (since both can be found in one traversal)
     for (int i = 0; i < (int)g_lines; ++i) {
         if (g_cache[setBits][i].valid &&
@@ -55,50 +65,131 @@ int cacheFunc(unsigned long long data) {
             if (g_save)
                 g_cache[setBits][i].dirty = true;
             // Since hit, want to retain this block as most used
-            incLRU(setBits);
-            g_cache[setBits][i].lru = 1;
+            if(g_policy == 1){
+              incLRU(setBits);
+              g_cache[setBits][i].lru = 1;
+            }
+            if(g_policy == 2){
+              g_cache[setBits][i].bitPLRU = true;
+            }
             g_hits += 1;
             return 1;
         }
         // Find empty or lru block in case no hit
-        if (g_cache[setBits][i].valid) {
-            if (g_cache[setBits][i].lru >= (g_cache[setBits][lruInd].lru))
-                lruInd = i;
-        } else
-            emptyBlockInd = i;
+        if(g_policy == 0){}
+        else if(g_policy == 1){
+          if (g_cache[setBits][i].valid) {
+              if (g_cache[setBits][i].lru >= (g_cache[setBits][lruInd].lru))
+                  lruInd = i;
+          } else
+              emptyBlockInd = i;
+        }
+        else if (g_policy == 2){
+          if (g_cache[setBits][i].valid) {
+              if (!g_cache[setBits][i].bitPLRU) plruInd = i;
+              else plrus += 1;
+          } else
+              emptyBlockInd = i;
+        } else return -1;
     }
-    // Increment lru if no hit so new add will be most recently used
-    incLRU(setBits);
-    // Write into empty or lru block
-    if (emptyBlockInd != -1) {
-        // If empty block somewhere
-        g_cache[setBits][emptyBlockInd].set_b = setBits;
-        g_cache[setBits][emptyBlockInd].tag_b = tagBits;
-        g_cache[setBits][emptyBlockInd].off_b = offBits;
-        g_cache[setBits][emptyBlockInd].lru = 1;
-        g_cache[setBits][emptyBlockInd].valid = true;
-        g_cache[setBits][emptyBlockInd].dirty = g_save;
+    if(g_policy == 0){
+      int randLine = rand() % g_lines;
+      if(g_cache[setBits][randLine].valid){
+        // IDEALLY WOULD SAVE OVERWRITTEN DATA NOW INTO LOWER MEM
+        // Instead just replace with load request as though reading from
+        // lower mem
+        if (g_cache[setBits][randLine].dirty)
+          g_dirty_evictions += 1;
+        g_cache[setBits][randLine].set_b = setBits;
+        g_cache[setBits][randLine].tag_b = tagBits;
+        g_cache[setBits][randLine].off_b = offBits;
+        g_cache[setBits][randLine].valid = true;
+        g_cache[setBits][randLine].dirty = g_save;
+        g_misses += 1;
+        g_evictions += 1;
+        return 3;
+      }else{
+        g_cache[setBits][randLine].set_b = setBits;
+        g_cache[setBits][randLine].tag_b = tagBits;
+        g_cache[setBits][randLine].off_b = offBits;
+        g_cache[setBits][randLine].valid = true;
+        g_cache[setBits][randLine].dirty = g_save;
         g_misses += 1;
         return 2;
-    } else {
-        // If no empty blocks use lru to evict
-        if (g_cache[setBits][lruInd].valid) {
-            // IDEALLY WOULD SAVE OVERWRITTEN DATA NOW INTO LOWER MEM
-            // Instead just replace with load request as though reading from
-            // lower mem
-            if (g_cache[setBits][lruInd].dirty)
-              g_dirty_evictions += 1;
-            g_cache[setBits][lruInd].set_b = setBits;
-            g_cache[setBits][lruInd].tag_b = tagBits;
-            g_cache[setBits][lruInd].off_b = offBits;
-            g_cache[setBits][lruInd].lru = 1;
-            g_cache[setBits][lruInd].valid = true;
-            g_cache[setBits][lruInd].dirty = g_save;
-            g_misses += 1;
-            g_evictions += 1;
-            return 3;
-        } else
-            return -1;
+      }
+    }
+    else if(g_policy == 1){
+      // Increment lru if no hit so new add will be most recently used
+      incLRU(setBits);
+      // Write into empty or lru block
+      if (emptyBlockInd != -1) {
+          // If empty block somewhere
+          g_cache[setBits][emptyBlockInd].set_b = setBits;
+          g_cache[setBits][emptyBlockInd].tag_b = tagBits;
+          g_cache[setBits][emptyBlockInd].off_b = offBits;
+          g_cache[setBits][emptyBlockInd].lru = 1;
+          g_cache[setBits][emptyBlockInd].valid = true;
+          g_cache[setBits][emptyBlockInd].dirty = g_save;
+          g_misses += 1;
+          return 2;
+      } else {
+          // If no empty blocks use lru to evict
+          if (g_cache[setBits][lruInd].valid) {
+              // IDEALLY WOULD SAVE OVERWRITTEN DATA NOW INTO LOWER MEM
+              // Instead just replace with load request as though reading from
+              // lower mem
+              if (g_cache[setBits][lruInd].dirty)
+                g_dirty_evictions += 1;
+              g_cache[setBits][lruInd].set_b = setBits;
+              g_cache[setBits][lruInd].tag_b = tagBits;
+              g_cache[setBits][lruInd].off_b = offBits;
+              g_cache[setBits][lruInd].lru = 1;
+              g_cache[setBits][lruInd].valid = true;
+              g_cache[setBits][lruInd].dirty = g_save;
+              g_misses += 1;
+              g_evictions += 1;
+              return 3;
+          } else
+              return -1;
+      }
+    } else if (g_policy == 2){
+      
+      // Write into empty or lru block
+      if (emptyBlockInd != -1) {
+          // If empty block somewhere
+          g_cache[setBits][emptyBlockInd].set_b = setBits;
+          g_cache[setBits][emptyBlockInd].tag_b = tagBits;
+          g_cache[setBits][emptyBlockInd].off_b = offBits;
+          g_cache[setBits][emptyBlockInd].bitPLRU = false;
+          g_cache[setBits][emptyBlockInd].valid = true;
+          g_cache[setBits][emptyBlockInd].dirty = g_save;
+          g_misses += 1;
+          return 2;
+      } else {
+          if(plrus == (int)g_sets){
+            clearPLRUS(setBits);
+            plruInd = 0;
+            plrus = 0;
+          }
+          // If no empty blocks use lru to evict
+          if (g_cache[setBits][plruInd].valid) {
+              // IDEALLY WOULD SAVE OVERWRITTEN DATA NOW INTO LOWER MEM
+              // Instead just replace with load request as though reading from
+              // lower mem
+              if (g_cache[setBits][plruInd].dirty)
+                g_dirty_evictions += 1;
+              g_cache[setBits][plruInd].set_b = setBits;
+              g_cache[setBits][plruInd].tag_b = tagBits;
+              g_cache[setBits][plruInd].off_b = offBits;
+              g_cache[setBits][plruInd].bitPLRU = false;
+              g_cache[setBits][plruInd].valid = true;
+              g_cache[setBits][plruInd].dirty = g_save;
+              g_misses += 1;
+              g_evictions += 1;
+              return 3;
+          } else
+              return -1;
+      }
     }
     return -1;
 }

@@ -42,6 +42,7 @@ unsigned long long g_offMask;
 unsigned long long g_setMask;
 unsigned long long g_tag_bits;
 unsigned long long g_tagMask;
+int g_policy;
 block_t **g_cache;
 
 /* ===================================================================== */
@@ -56,6 +57,8 @@ KNOB<UINT32> KnobL1LineSize(KNOB_MODE_WRITEONCE, "pintool",
     "l1b","64", "cache block size in bytes");
 KNOB<UINT32> KnobL1Associativity(KNOB_MODE_WRITEONCE, "pintool",
     "l1a","2", "cache associativity (1 for direct mapped)");
+KNOB<UINT32> KnobL1Policy(KNOB_MODE_WRITEONCE, "pintool",
+    "pol","2", "cache replacement policy");
 
 /* ===================================================================== */
 
@@ -159,9 +162,13 @@ VOID Fini(int code, VOID * v)
     stats->dirty_bytes = g_dirty_bytes;
     stats->dirty_evictions = (unsigned long)g_blocks * g_dirty_evictions;
     */
-    out << g_hits << ",";
-    out << g_misses << ",";
-    out << g_evictions << ",";
+    out << KnobL1Policy.Value() << ", ";
+    out << KnobL1CacheSize.Value() << ", ";
+    out << KnobL1Associativity.Value() << ", ";
+    out << g_hits << ", ";
+    out << g_misses << ", ";
+    out << g_evictions << ", ";
+    out << ((float)(g_misses)) / ((float)(g_misses+g_hits)) << std::endl;
         
     out.close();
     freeCache();
@@ -187,6 +194,7 @@ int main(int argc, char *argv[])
     g_block_bits = (int)(log((double)((KnobL1LineSize.Value())))/log((double)2));// (cachesize / linesize)
     g_block_size = (KnobL1LineSize.Value());
     g_tag_bits = 64 - g_set_bits - g_block_bits;
+    g_policy = (int)KnobL1Policy.Value();
 
 
     // Pre-allocate cache:
@@ -201,6 +209,7 @@ int main(int argc, char *argv[])
         for (int j = 0; j < (int)g_lines; ++j) {
             g_cache[i][j].valid = false;
             g_cache[i][j].dirty = false;
+            g_cache[i][j].bitPLRU = false;
             g_cache[i][j].lru = 0;
             g_cache[i][j].set_b = 0;
             g_cache[i][j].off_b = 0;

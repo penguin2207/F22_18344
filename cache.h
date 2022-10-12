@@ -26,11 +26,14 @@ extern unsigned long long g_offMask;
 extern unsigned long long g_setMask;
 extern unsigned long long g_tagMask;
 
+extern int g_policy;
+
 typedef struct {
     unsigned long long set_b; /* set bits */
     unsigned long long tag_b; /* tag bits */
     unsigned long long off_b; /* offset bits */
     int lru;
+    bool bitPLRU;
     bool valid; /* valid bit */
     bool dirty; /* dirty bit */
 } block_t;

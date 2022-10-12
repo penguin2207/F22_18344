@@ -1,0 +1,250 @@
+SPEC CPU(r) 2017 Benchmark Suites
+Copyright 1995-2017 Standard Performance Evaluation Corporation (SPEC)
+
+runcpu v5825
+Using 'linux-x86_64' tools
+Reading file manifests... read 32272 entries from 2 files in 0.15s (218659 files/s)
+Loading runcpu modules.................
+Locating benchmarks...found 47 benchmarks in 53 benchsets.
+Reading config file '/afs/ece.cmu.edu/class/ece344/opt/spec2017/config/18344-f22-ewirthap.cfg'
+1 configuration selected:
+
+ Action    Run Mode   Workload      Report Type      Benchmarks
+--------   --------   --------   -----------------   --------------------------
+only_run   speed      test       SPECspeed2017_int   602.gcc_s                 
+-------------------------------------------------------------------------------
+
+Setting up environment for running 602.gcc_s...
+Starting runcpu for 602.gcc_s...
+Running "specperl /afs/ece.cmu.edu/class/ece344/opt/spec2017/bin/sysinfo" to gather system information.
+sysinfo: r5974 of 2018-05-19 (9bcde8f2999c33d61f64985e45859ea9)
+sysinfo: Getting system information for Linux...
+sysinfo: ...getting CPU info
+sysinfo: ...getting info from numactl
+sysinfo: ...getting memory info
+sysinfo: ...getting OS info
+sysinfo: ...getting CPU vulnerability status from the kernel
+sysinfo: ...getting disk info
+sysinfo: ...trying to get DIMM info from dmidecode
+Retrieving flags file (/afs/ece.cmu.edu/class/ece344/opt/spec2017/config/flags/gcc.xml)...
+Benchmarks selected: 602.gcc_s
+Compiling Binaries
+  Up to date 602.gcc_s base mytest-m64
+
+
+Setting Up Run Directories
+  Setting up 602.gcc_s test base mytest-m64: run_base_test_mytest-m64.0001
+Running Benchmarks
+  Running 602.gcc_s test base mytest-m64 threads:4 [2022-10-11 19:08:15]
+SPEC CPU(r) 2017 Benchmark Suites
+Copyright 1995-2017 Standard Performance Evaluation Corporation (SPEC)
+
+runcpu v5825
+Using 'linux-x86_64' tools
+Reading file manifests... read 32272 entries from 2 files in 0.15s (211893 files/s)
+Loading runcpu modules.................
+Locating benchmarks...found 47 benchmarks in 53 benchsets.
+Reading config file '/afs/ece.cmu.edu/class/ece344/opt/spec2017/config/18344-f22-ewirthap.cfg'
+1 configuration selected:
+
+ Action    Run Mode   Workload      Report Type      Benchmarks
+--------   --------   --------   -----------------   --------------------------
+only_run   speed      test       SPECspeed2017_int   602.gcc_s                 
+-------------------------------------------------------------------------------
+
+Setting up environment for running 602.gcc_s...
+Starting runcpu for 602.gcc_s...
+Running "specperl /afs/ece.cmu.edu/class/ece344/opt/spec2017/bin/sysinfo" to gather system information.
+sysinfo: r5974 of 2018-05-19 (9bcde8f2999c33d61f64985e45859ea9)
+sysinfo: Getting system information for Linux...
+sysinfo: ...getting CPU info
+sysinfo: ...getting info from numactl
+sysinfo: ...getting memory info
+sysinfo: ...getting OS info
+sysinfo: ...getting CPU vulnerability status from the kernel
+sysinfo: ...getting disk info
+sysinfo: ...trying to get DIMM info from dmidecode
+Retrieving flags file (/afs/ece.cmu.edu/class/ece344/opt/spec2017/config/flags/gcc.xml)...
+Benchmarks selected: 602.gcc_s
+Compiling Binaries
+  Up to date 602.gcc_s base mytest-m64
+
+
+Setting Up Run Directories
+  Setting up 602.gcc_s test base mytest-m64: run_base_test_mytest-m64.0002
+Running Benchmarks
+  Running 602.gcc_s test base mytest-m64 threads:4 [2022-10-12 14:15:49]
+Run Complete
+The log for this run is in /tmp/ewirthap-spec/result/CPU2017.003.log
+
+runcpu finished at 2022-10-12 14:15:49; 6 total seconds elapsed
+SPEC CPU(r) 2017 Benchmark Suites
+Copyright 1995-2017 Standard Performance Evaluation Corporation (SPEC)
+
+runcpu v5825
+Using 'linux-x86_64' tools
+Reading file manifests... read 32272 entries from 2 files in 0.15s (210669 files/s)
+Loading runcpu modules.................
+Locating benchmarks...found 47 benchmarks in 53 benchsets.
+Reading config file '/afs/ece.cmu.edu/class/ece344/opt/spec2017/config/18344-f22-ewirthap.cfg'
+1 configuration selected:
+
+ Action    Run Mode   Workload      Report Type      Benchmarks
+--------   --------   --------   -----------------   --------------------------
+only_run   speed      test       SPECspeed2017_int   602.gcc_s                 
+-------------------------------------------------------------------------------
+
+Setting up environment for running 602.gcc_s...
+Starting runcpu for 602.gcc_s...
+Running "specperl /afs/ece.cmu.edu/class/ece344/opt/spec2017/bin/sysinfo" to gather system information.
+sysinfo: r5974 of 2018-05-19 (9bcde8f2999c33d61f64985e45859ea9)
+sysinfo: Getting system information for Linux...
+sysinfo: ...getting CPU info
+sysinfo: ...getting info from numactl
+sysinfo: ...getting memory info
+sysinfo: ...getting OS info
+sysinfo: ...getting CPU vulnerability status from the kernel
+sysinfo: ...getting disk info
+sysinfo: ...trying to get DIMM info from dmidecode
+Retrieving flags file (/afs/ece.cmu.edu/class/ece344/opt/spec2017/config/flags/gcc.xml)...
+Benchmarks selected: 602.gcc_s
+Compiling Binaries
+  Up to date 602.gcc_s base mytest-m64
+
+
+Setting Up Run Directories
+  Setting up 602.gcc_s test base mytest-m64: run_base_test_mytest-m64.0002
+Running Benchmarks
+  Running 602.gcc_s test base mytest-m64 threads:4 [2022-10-12 14:17:38]
+Run Complete
+The log for this run is in /tmp/ewirthap-spec/result/CPU2017.004.log
+
+runcpu finished at 2022-10-12 14:17:38; 6 total seconds elapsed
+SPEC CPU(r) 2017 Benchmark Suites
+Copyright 1995-2017 Standard Performance Evaluation Corporation (SPEC)
+
+runcpu v5825
+Using 'linux-x86_64' tools
+Reading file manifests... read 32272 entries from 2 files in 0.17s (190521 files/s)
+Loading runcpu modules.................
+Locating benchmarks...found 47 benchmarks in 53 benchsets.
+Reading config file '/afs/ece.cmu.edu/class/ece344/opt/spec2017/config/18344-f22-ewirthap.cfg'
+1 configuration selected:
+
+ Action    Run Mode   Workload      Report Type      Benchmarks
+--------   --------   --------   -----------------   --------------------------
+only_run   speed      test       SPECspeed2017_int   602.gcc_s                 
+-------------------------------------------------------------------------------
+
+Setting up environment for running 602.gcc_s...
+Starting runcpu for 602.gcc_s...
+Running "specperl /afs/ece.cmu.edu/class/ece344/opt/spec2017/bin/sysinfo" to gather system information.
+sysinfo: r5974 of 2018-05-19 (9bcde8f2999c33d61f64985e45859ea9)
+sysinfo: Getting system information for Linux...
+sysinfo: ...getting CPU info
+sysinfo: ...getting info from numactl
+sysinfo: ...getting memory info
+sysinfo: ...getting OS info
+sysinfo: ...getting CPU vulnerability status from the kernel
+sysinfo: ...getting disk info
+sysinfo: ...trying to get DIMM info from dmidecode
+Retrieving flags file (/afs/ece.cmu.edu/class/ece344/opt/spec2017/config/flags/gcc.xml)...
+Benchmarks selected: 602.gcc_s
+Compiling Binaries
+  Up to date 602.gcc_s base mytest-m64
+
+
+Setting Up Run Directories
+  Setting up 602.gcc_s test base mytest-m64: run_base_test_mytest-m64.0002
+Running Benchmarks
+  Running 602.gcc_s test base mytest-m64 threads:4 [2022-10-12 14:31:23]
+Run Complete
+The log for this run is in /tmp/ewirthap-spec/result/CPU2017.005.log
+
+runcpu finished at 2022-10-12 14:31:23; 6 total seconds elapsed
+SPEC CPU(r) 2017 Benchmark Suites
+Copyright 1995-2017 Standard Performance Evaluation Corporation (SPEC)
+
+runcpu v5825
+Using 'linux-x86_64' tools
+Reading file manifests... read 32272 entries from 2 files in 0.17s (191077 files/s)
+Loading runcpu modules.................
+Locating benchmarks...found 47 benchmarks in 53 benchsets.
+Reading config file '/afs/ece.cmu.edu/class/ece344/opt/spec2017/config/18344-f22-ewirthap.cfg'
+1 configuration selected:
+
+ Action    Run Mode   Workload      Report Type      Benchmarks
+--------   --------   --------   -----------------   --------------------------
+only_run   speed      test       SPECspeed2017_int   602.gcc_s                 
+-------------------------------------------------------------------------------
+
+Setting up environment for running 602.gcc_s...
+Starting runcpu for 602.gcc_s...
+Running "specperl /afs/ece.cmu.edu/class/ece344/opt/spec2017/bin/sysinfo" to gather system information.
+sysinfo: r5974 of 2018-05-19 (9bcde8f2999c33d61f64985e45859ea9)
+sysinfo: Getting system information for Linux...
+sysinfo: ...getting CPU info
+sysinfo: ...getting info from numactl
+sysinfo: ...getting memory info
+sysinfo: ...getting OS info
+sysinfo: ...getting CPU vulnerability status from the kernel
+sysinfo: ...getting disk info
+sysinfo: ...trying to get DIMM info from dmidecode
+Retrieving flags file (/afs/ece.cmu.edu/class/ece344/opt/spec2017/config/flags/gcc.xml)...
+Benchmarks selected: 602.gcc_s
+Compiling Binaries
+  Up to date 602.gcc_s base mytest-m64
+
+
+Setting Up Run Directories
+  Setting up 602.gcc_s test base mytest-m64: run_base_test_mytest-m64.0002
+Running Benchmarks
+  Running 602.gcc_s test base mytest-m64 threads:4 [2022-10-12 14:32:13]
+Run Complete
+The log for this run is in /tmp/ewirthap-spec/result/CPU2017.006.log
+
+runcpu finished at 2022-10-12 14:32:13; 6 total seconds elapsed
+SPEC CPU(r) 2017 Benchmark Suites
+Copyright 1995-2017 Standard Performance Evaluation Corporation (SPEC)
+
+runcpu v5825
+Using 'linux-x86_64' tools
+Reading file manifests... read 32272 entries from 2 files in 0.17s (193430 files/s)
+Loading runcpu modules.................
+Locating benchmarks...found 47 benchmarks in 53 benchsets.
+Reading config file '/afs/ece.cmu.edu/class/ece344/opt/spec2017/config/18344-f22-ewirthap.cfg'
+1 configuration selected:
+
+ Action    Run Mode   Workload      Report Type      Benchmarks
+--------   --------   --------   -----------------   --------------------------
+only_run   speed      test       SPECspeed2017_int   602.gcc_s                 
+-------------------------------------------------------------------------------
+
+Setting up environment for running 602.gcc_s...
+Starting runcpu for 602.gcc_s...
+Running "specperl /afs/ece.cmu.edu/class/ece344/opt/spec2017/bin/sysinfo" to gather system information.
+sysinfo: r5974 of 2018-05-19 (9bcde8f2999c33d61f64985e45859ea9)
+sysinfo: Getting system information for Linux...
+sysinfo: ...getting CPU info
+sysinfo: ...getting info from numactl
+sysinfo: ...getting memory info
+sysinfo: ...getting OS info
+sysinfo: ...getting CPU vulnerability status from the kernel
+sysinfo: ...getting disk info
+sysinfo: ...trying to get DIMM info from dmidecode
+Retrieving flags file (/afs/ece.cmu.edu/class/ece344/opt/spec2017/config/flags/gcc.xml)...
+Benchmarks selected: 602.gcc_s
+Compiling Binaries
+  Building 602.gcc_s base mytest-m64: (build_base_mytest-m64.0000) [2022-10-12 15:52:53]
+
+Build successes for intspeed: 602.gcc_s(base)
+Build errors for intspeed: None
+
+Setting Up Run Directories
+  Setting up 602.gcc_s test base mytest-m64: run_base_test_mytest-m64.0000
+Running Benchmarks
+  Running 602.gcc_s test base mytest-m64 threads:4 [2022-10-12 15:54:05]
+Run Complete
+The log for this run is in /tmp/ewirthap-spec/result/CPU2017.001.log
+
+runcpu finished at 2022-10-12 15:54:06; 75 total seconds elapsed
