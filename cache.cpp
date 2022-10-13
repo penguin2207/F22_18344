@@ -12,6 +12,7 @@ unsigned long g_misses;
 unsigned long g_evictions;
 unsigned long g_dirty_evictions;
 bool g_save;
+int g_error;
 
 
 // Function to increment lru
@@ -25,7 +26,6 @@ int incLRU(unsigned long long sb) {
 
 int clearPLRUS(unsigned long long sb){
   for (int i = 0; i < (int)g_lines; ++i) {
-        if (g_cache[sb][i].valid)
             g_cache[sb][i].bitPLRU = false;
   }
   return 0;
@@ -35,12 +35,12 @@ int clearPLRUS(unsigned long long sb){
 
 void mhLoad(void *addr, size_t size, void *instAddr){
   g_save = false;
-  cacheFunc((unsigned long long)addr);
+  if(cacheFunc((unsigned long long)addr) == -1) g_error++;
 }
 
 void mhStore(void *addr, size_t size, void *instAddr){
   g_save = true;
-  cacheFunc((unsigned long long)addr);
+  if(cacheFunc((unsigned long long)addr) == -1) g_error++;
 }
 
 
@@ -160,7 +160,7 @@ int cacheFunc(unsigned long long data) {
           g_cache[setBits][emptyBlockInd].set_b = setBits;
           g_cache[setBits][emptyBlockInd].tag_b = tagBits;
           g_cache[setBits][emptyBlockInd].off_b = offBits;
-          g_cache[setBits][emptyBlockInd].bitPLRU = false;
+          g_cache[setBits][emptyBlockInd].bitPLRU = true;
           g_cache[setBits][emptyBlockInd].valid = true;
           g_cache[setBits][emptyBlockInd].dirty = g_save;
           g_misses += 1;
@@ -169,19 +169,19 @@ int cacheFunc(unsigned long long data) {
           if(plrus == (int)g_sets){
             clearPLRUS(setBits);
             plruInd = 0;
-            plrus = 0;
           }
           // If no empty blocks use lru to evict
-          if (g_cache[setBits][plruInd].valid) {
+          if (plruInd != -1) {
+              if(g_cache[setBits][plruInd].valid){}
               // IDEALLY WOULD SAVE OVERWRITTEN DATA NOW INTO LOWER MEM
               // Instead just replace with load request as though reading from
               // lower mem
-              if (g_cache[setBits][plruInd].dirty)
+              if (g_cache[setBits][plruInd].valid && g_cache[setBits][plruInd].dirty)
                 g_dirty_evictions += 1;
               g_cache[setBits][plruInd].set_b = setBits;
               g_cache[setBits][plruInd].tag_b = tagBits;
               g_cache[setBits][plruInd].off_b = offBits;
-              g_cache[setBits][plruInd].bitPLRU = false;
+              g_cache[setBits][plruInd].bitPLRU = true;
               g_cache[setBits][plruInd].valid = true;
               g_cache[setBits][plruInd].dirty = g_save;
               g_misses += 1;

@@ -168,7 +168,8 @@ VOID Fini(int code, VOID * v)
     out << g_hits << ", ";
     out << g_misses << ", ";
     out << g_evictions << ", ";
-    out << ((float)(g_misses)) / ((float)(g_misses+g_hits)) << std::endl;
+    out << ((float)(g_misses)) / ((float)(g_misses+g_hits)) << ", "; 
+    out << g_error << std::endl;
         
     out.close();
     freeCache();
@@ -195,6 +196,7 @@ int main(int argc, char *argv[])
     g_block_size = (KnobL1LineSize.Value());
     g_tag_bits = 64 - g_set_bits - g_block_bits;
     g_policy = (int)KnobL1Policy.Value();
+    g_error = 0;
 
 
     // Pre-allocate cache:

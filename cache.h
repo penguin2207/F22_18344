@@ -27,6 +27,7 @@ extern unsigned long long g_setMask;
 extern unsigned long long g_tagMask;
 
 extern int g_policy;
+extern int g_error;
 
 typedef struct {
     unsigned long long set_b; /* set bits */
