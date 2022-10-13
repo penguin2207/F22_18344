@@ -85,11 +85,8 @@ int cacheFunc(unsigned long long data) {
               emptyBlockInd = i;
         }
         else if (g_policy == 2){
-          if (g_cache[setBits][i].valid) {
               if (!g_cache[setBits][i].bitPLRU) plruInd = i;
               else plrus += 1;
-          } else
-              emptyBlockInd = i;
         } else return -1;
     }
     if(g_policy == 0){
@@ -154,18 +151,7 @@ int cacheFunc(unsigned long long data) {
       }
     } else if (g_policy == 2){
       
-      // Write into empty or lru block
-      if (emptyBlockInd != -1) {
-          // If empty block somewhere
-          g_cache[setBits][emptyBlockInd].set_b = setBits;
-          g_cache[setBits][emptyBlockInd].tag_b = tagBits;
-          g_cache[setBits][emptyBlockInd].off_b = offBits;
-          g_cache[setBits][emptyBlockInd].bitPLRU = true;
-          g_cache[setBits][emptyBlockInd].valid = true;
-          g_cache[setBits][emptyBlockInd].dirty = g_save;
-          g_misses += 1;
-          return 2;
-      } else {
+          // Write into empty or lru block
           if(plrus == (int)g_sets){
             clearPLRUS(setBits);
             plruInd = 0;
@@ -189,7 +175,6 @@ int cacheFunc(unsigned long long data) {
               return 3;
           } else
               return -1;
-      }
     }
     return -1;
 }
