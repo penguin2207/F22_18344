@@ -150,9 +150,7 @@ int cacheFunc(unsigned long long data) {
               return -1;
       }
     } else if (g_policy == 2){
-      
-          // Write into empty or lru block
-          if(plrus == (int)g_sets){
+          if(plrus == (int)g_lines){
             clearPLRUS(setBits);
             plruInd = 0;
           }

@@ -115,3 +115,10 @@ Run Complete
 The log for this run is in /tmp/ewirthap-spec/result/CPU2017.006.log
 
 runcpu finished at 2022-10-12 18:44:03; 156 total seconds elapsed
+  Setting up 625.x264_s test base mytest-m64: run_base_test_mytest-m64.0000
+Running Benchmarks
+  Running 625.x264_s test base mytest-m64 threads:4 [2022-10-13 00:10:22]
+Run Complete
+The log for this run is in /tmp/ewirthap-spec/result/CPU2017.005.log
+
+runcpu finished at 2022-10-13 09:56:00; 55438 total seconds elapsed
