@@ -32,18 +32,32 @@ using std::cerr;
 using std::endl;
 using std::string;
 
-unsigned long long g_block_size;
-unsigned long long g_sets;
-unsigned long long g_set_bits;
-unsigned long long g_lines;
-unsigned long long g_blocks;
-unsigned long long g_block_bits;
-unsigned long long g_offMask;
-unsigned long long g_setMask;
-unsigned long long g_tag_bits;
-unsigned long long g_tagMask;
-int g_policy;
-block_t **g_cache;
+unsigned long long g_block_sizeL1;
+unsigned long long g_setsL1;
+unsigned long long g_set_bitsL1;
+unsigned long long g_linesL1;
+unsigned long long g_blocksL1;
+unsigned long long g_block_bitsL1;
+unsigned long long g_offMaskL1;
+unsigned long long g_setMaskL1;
+unsigned long long g_tag_bitsL1;
+unsigned long long g_tagMaskL1;
+int g_policyL1;
+block_t **g_cacheL1;
+
+unsigned long long g_block_sizeL2;
+unsigned long long g_setsL2;
+unsigned long long g_set_bitsL2;
+unsigned long long g_linesL2;
+unsigned long long g_blocksL2;
+unsigned long long g_block_bitsL2;
+unsigned long long g_offMaskL2;
+unsigned long long g_setMaskL2;
+unsigned long long g_tag_bitsL2;
+unsigned long long g_tagMaskL2;
+int g_policyL2;
+block_t **g_cacheL2;
+
 
 /* ===================================================================== */
 /* Commandline Switches */
@@ -58,7 +72,16 @@ KNOB<UINT32> KnobL1LineSize(KNOB_MODE_WRITEONCE, "pintool",
 KNOB<UINT32> KnobL1Associativity(KNOB_MODE_WRITEONCE, "pintool",
     "l1a","2", "cache associativity (1 for direct mapped)");
 KNOB<UINT32> KnobL1Policy(KNOB_MODE_WRITEONCE, "pintool",
-    "pol","2", "cache replacement policy");
+    "l1p","2", "cache replacement policy");
+
+KNOB<UINT32> KnobL2CacheSize(KNOB_MODE_WRITEONCE, "pintool",
+    "l2c","2", "cache size in kilobytes");
+KNOB<UINT32> KnobL2LineSize(KNOB_MODE_WRITEONCE, "pintool",
+    "l2b","64", "cache block size in bytes");
+KNOB<UINT32> KnobL2Associativity(KNOB_MODE_WRITEONCE, "pintool",
+    "l2a","2", "cache associativity (1 for direct mapped)");
+KNOB<UINT32> KnobL2Policy(KNOB_MODE_WRITEONCE, "pintool",
+    "l2p","2", "cache replacement policy");
 
 /* ===================================================================== */
 
@@ -135,10 +158,17 @@ VOID Instruction(INS ins, void * v)
 
 
 
-int freeCache() {
-    for (int i = 0; i < (int)g_sets; ++i)
-        free(g_cache[i]);
-    free(g_cache);
+int freeCacheL1() {
+    for (int i = 0; i < (int)g_setsL1; ++i)
+        free(g_cacheL1[i]);
+    free(g_cacheL1);
+    return 0;
+}
+
+int freeCacheL2() {
+    for (int i = 0; i < (int)g_setsL2; ++i)
+        free(g_cacheL2[i]);
+    free(g_cacheL2);
     return 0;
 }
 
@@ -165,14 +195,25 @@ VOID Fini(int code, VOID * v)
     out << KnobL1Policy.Value() << ", ";
     out << KnobL1CacheSize.Value() << ", ";
     out << KnobL1Associativity.Value() << ", ";
-    out << g_hits << ", ";
-    out << g_misses << ", ";
-    out << g_evictions << ", ";
-    out << ((float)(g_misses)) / ((float)(g_misses+g_hits)) << ", "; 
-    out << g_error << std::endl;
+    out << g_setsL1 << ", ";
+    out << g_hitsL1 << ", ";
+    out << g_missesL1 << ", ";
+    out << g_evictionsL1 << ", ";
+    out << ((float)(g_missesL1)) / ((float)(g_missesL1+g_hitsL1)) << ", "; 
+    out << g_errorL1 << ", ";
+    out << KnobL2Policy.Value() << ", ";
+    out << KnobL2CacheSize.Value() << ", ";
+    out << KnobL2Associativity.Value() << ", ";
+    out << g_setsL2 << ", ";
+    out << g_hitsL2 << ", ";
+    out << g_missesL2 << ", ";
+    out << g_evictionsL2 << ", ";
+    out << ((float)(g_missesL2)) / ((float)(g_missesL2+g_hitsL2)) << ", "; 
+    out << g_errorL2 << std::endl;
         
     out.close();
-    freeCache();
+    freeCacheL1();
+    freeCacheL2();
 }
 
 /* ===================================================================== */
@@ -189,42 +230,77 @@ int main(int argc, char *argv[])
         return Usage();
     }
 
-    g_set_bits = (int)(log((double)((KnobL1CacheSize.Value()/KnobL1LineSize.Value()) / KnobL1Associativity.Value()))/log((double)2));// (cachesize / linesize) / associativity
-    g_sets = (int)(((KnobL1CacheSize.Value()/KnobL1LineSize.Value()) / KnobL1Associativity.Value()));
-    g_lines = KnobL1Associativity.Value();// associativty
-    g_block_bits = (int)(log((double)((KnobL1LineSize.Value())))/log((double)2));// (cachesize / linesize)
-    g_block_size = (KnobL1LineSize.Value());
-    g_tag_bits = 64 - g_set_bits - g_block_bits;
-    g_policy = (int)KnobL1Policy.Value();
-    g_error = 0;
+    g_set_bitsL1 = (int)(log((double)((KnobL1CacheSize.Value()/KnobL1LineSize.Value()) / KnobL1Associativity.Value()))/log((double)2));// (cachesize / linesize) / associativity
+    g_setsL1 = (int)(((KnobL1CacheSize.Value()/KnobL1LineSize.Value()) / KnobL1Associativity.Value()));
+    g_linesL1 = KnobL1Associativity.Value();// associativty
+    g_block_bitsL1 = (int)(log((double)((KnobL1LineSize.Value())))/log((double)2));// (cachesize / linesize)
+    g_block_sizeL1 = (KnobL1LineSize.Value());
+    g_tag_bitsL1 = 64 - g_set_bitsL1 - g_block_bitsL1;
+    g_policyL1 = (int)KnobL1Policy.Value();
+    g_errorL1 = 0;
+
+    g_set_bitsL2 = (int)(log((double)((KnobL2CacheSize.Value()/KnobL2LineSize.Value()) / KnobL2Associativity.Value()))/log((double)2));// (cachesize / linesize) / associativity
+    g_setsL2 = (int)(((KnobL2CacheSize.Value()/KnobL2LineSize.Value()) / KnobL2Associativity.Value()));
+    g_linesL2 = KnobL2Associativity.Value();// associativty
+    g_block_bitsL2 = (int)(log((double)((KnobL2LineSize.Value())))/log((double)2));// (cachesize / linesize)
+    g_block_sizeL2 = (KnobL2LineSize.Value());
+    g_tag_bitsL2 = 64 - g_set_bitsL2 - g_block_bitsL2;
+    g_policyL2 = (int)KnobL2Policy.Value();
+    g_errorL2 = 0;
 
 
     // Pre-allocate cache:
-    g_cache = (block_t **)malloc((g_sets) *
+    g_cacheL1 = (block_t **)malloc((g_setsL1) *
                                  sizeof(block_t *));
-    for (int i = 0; i < (int)g_sets; ++i) {
-        g_cache[i] =
-            (block_t *)malloc(((unsigned long long)g_lines) * sizeof(block_t));
+    for (int i = 0; i < (int)g_setsL1; ++i) {
+        g_cacheL1[i] =
+            (block_t *)malloc(((unsigned long long)g_linesL1) * sizeof(block_t));
     }
     // Initialize cache values
-    for (int i = 0; i < (int)g_sets; ++i) {
-        for (int j = 0; j < (int)g_lines; ++j) {
-            g_cache[i][j].valid = false;
-            g_cache[i][j].dirty = false;
-            g_cache[i][j].bitPLRU = false;
-            g_cache[i][j].lru = 0;
-            g_cache[i][j].set_b = 0;
-            g_cache[i][j].off_b = 0;
-            g_cache[i][j].tag_b = 0;
+    for (int i = 0; i < (int)g_setsL1; ++i) {
+        for (int j = 0; j < (int)g_linesL1; ++j) {
+            g_cacheL1[i][j].valid = false;
+            g_cacheL1[i][j].dirty = false;
+            g_cacheL1[i][j].bitPLRU = false;
+            g_cacheL1[i][j].lru = 0;
+            g_cacheL1[i][j].set_b = 0;
+            g_cacheL1[i][j].off_b = 0;
+            g_cacheL1[i][j].tag_b = 0;
         }
     }
 
-    g_offMask = g_block_size - 1;
-    g_setMask = g_sets - 1;
-    for (int i = 0; i< (int)g_tag_bits; i++){
-      g_tagMask |= 1 << i;
+    g_offMaskL1 = g_block_sizeL1 - 1;
+    g_setMaskL1 = g_setsL1 - 1;
+    for (int i = 0; i< (int)g_tag_bitsL1; i++){
+      g_tagMaskL1 |= 1 << i;
     }
 
+
+    // Pre-allocate cache:
+    g_cacheL2 = (block_t **)malloc((g_setsL2) *
+                                 sizeof(block_t *));
+    for (int i = 0; i < (int)g_setsL2; ++i) {
+        g_cacheL2[i] =
+            (block_t *)malloc(((unsigned long long)g_linesL2) * sizeof(block_t));
+    }
+    // Initialize cache values
+    for (int i = 0; i < (int)g_setsL2; ++i) {
+        for (int j = 0; j < (int)g_linesL2; ++j) {
+            g_cacheL2[i][j].valid = false;
+            g_cacheL2[i][j].dirty = false;
+            g_cacheL2[i][j].bitPLRU = false;
+            g_cacheL2[i][j].lru = 0;
+            g_cacheL2[i][j].set_b = 0;
+            g_cacheL2[i][j].off_b = 0;
+            g_cacheL2[i][j].tag_b = 0;
+        }
+    }
+
+    g_offMaskL2 = g_block_sizeL2 - 1;
+    g_setMaskL2 = g_setsL2 - 1;
+    for (int i = 0; i< (int)g_tag_bitsL2; i++){
+      g_tagMaskL2 |= 1 << i;
+    }
 
 
 
