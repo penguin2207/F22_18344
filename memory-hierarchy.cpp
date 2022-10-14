@@ -67,19 +67,19 @@ KNOB<string> KnobOutputFile(KNOB_MODE_WRITEONCE,    "pintool",
     "o", "memhier.stats", "specify dcache file name");
 KNOB<UINT32> KnobL1CacheSize(KNOB_MODE_WRITEONCE, "pintool",
     "l1c","2", "cache size in kilobytes");
-KNOB<UINT32> KnobL1LineSize(KNOB_MODE_WRITEONCE, "pintool",
-    "l1b","64", "cache block size in bytes");
 KNOB<UINT32> KnobL1Associativity(KNOB_MODE_WRITEONCE, "pintool",
     "l1a","2", "cache associativity (1 for direct mapped)");
+KNOB<UINT32> KnobL1Sets(KNOB_MODE_WRITEONCE, "pintool",
+    "l1s","2", "cache sets");
 KNOB<UINT32> KnobL1Policy(KNOB_MODE_WRITEONCE, "pintool",
     "l1p","2", "cache replacement policy");
 
 KNOB<UINT32> KnobL2CacheSize(KNOB_MODE_WRITEONCE, "pintool",
     "l2c","2", "cache size in kilobytes");
-KNOB<UINT32> KnobL2LineSize(KNOB_MODE_WRITEONCE, "pintool",
-    "l2b","64", "cache block size in bytes");
 KNOB<UINT32> KnobL2Associativity(KNOB_MODE_WRITEONCE, "pintool",
     "l2a","2", "cache associativity (1 for direct mapped)");
+KNOB<UINT32> KnobL2Sets(KNOB_MODE_WRITEONCE, "pintool",
+    "l2s","2", "cache sets");
 KNOB<UINT32> KnobL2Policy(KNOB_MODE_WRITEONCE, "pintool",
     "l2p","2", "cache replacement policy");
 
@@ -196,6 +196,7 @@ VOID Fini(int code, VOID * v)
     out << KnobL1CacheSize.Value() << ", ";
     out << KnobL1Associativity.Value() << ", ";
     out << g_setsL1 << ", ";
+    out << g_block_sizeL1 << ", ";
     out << g_hitsL1 << ", ";
     out << g_missesL1 << ", ";
     out << g_evictionsL1 << ", ";
@@ -205,6 +206,7 @@ VOID Fini(int code, VOID * v)
     out << KnobL2CacheSize.Value() << ", ";
     out << KnobL2Associativity.Value() << ", ";
     out << g_setsL2 << ", ";
+    out << g_block_sizeL2 << ", ";
     out << g_hitsL2 << ", ";
     out << g_missesL2 << ", ";
     out << g_evictionsL2 << ", ";
@@ -230,20 +232,20 @@ int main(int argc, char *argv[])
         return Usage();
     }
 
-    g_set_bitsL1 = (int)(log((double)((KnobL1CacheSize.Value()/KnobL1LineSize.Value()) / KnobL1Associativity.Value()))/log((double)2));// (cachesize / linesize) / associativity
-    g_setsL1 = (int)(((KnobL1CacheSize.Value()/KnobL1LineSize.Value()) / KnobL1Associativity.Value()));
+    g_set_bitsL1 = (int)(log((double)KnobL1Sets.Value())/log((double)2));// (cachesize / linesize) / associativity
+    g_setsL1 = (int)KnobL1Sets.Value();
     g_linesL1 = KnobL1Associativity.Value();// associativty
-    g_block_bitsL1 = (int)(log((double)((KnobL1LineSize.Value())))/log((double)2));// (cachesize / linesize)
-    g_block_sizeL1 = (KnobL1LineSize.Value());
+    g_block_bitsL1 = (int)(log((double)((KnobL1CacheSize.Value() / KnobL1Associativity.Value()) / KnobL1Sets.Value()))/log((double)2));// (cachesize / linesize)
+    g_block_sizeL1 = (int)((KnobL1CacheSize.Value() / KnobL1Associativity.Value()) / KnobL1Sets.Value());
     g_tag_bitsL1 = 64 - g_set_bitsL1 - g_block_bitsL1;
     g_policyL1 = (int)KnobL1Policy.Value();
     g_errorL1 = 0;
 
-    g_set_bitsL2 = (int)(log((double)((KnobL2CacheSize.Value()/KnobL2LineSize.Value()) / KnobL2Associativity.Value()))/log((double)2));// (cachesize / linesize) / associativity
-    g_setsL2 = (int)(((KnobL2CacheSize.Value()/KnobL2LineSize.Value()) / KnobL2Associativity.Value()));
+    g_set_bitsL2 = (int)(log((double)KnobL2Sets.Value())/log((double)2));// (cachesize / linesize) / associativity
+    g_setsL2 = (int)KnobL2Sets.Value();
     g_linesL2 = KnobL2Associativity.Value();// associativty
-    g_block_bitsL2 = (int)(log((double)((KnobL2LineSize.Value())))/log((double)2));// (cachesize / linesize)
-    g_block_sizeL2 = (KnobL2LineSize.Value());
+    g_block_bitsL2 = (int)(log((double)((KnobL2CacheSize.Value() / KnobL2Associativity.Value()) / KnobL2Sets.Value()))/log((double)2));// (cachesize / linesize)
+    g_block_sizeL2 = (int)((KnobL2CacheSize.Value() / KnobL2Associativity.Value()) / KnobL2Sets.Value());
     g_tag_bitsL2 = 64 - g_set_bitsL2 - g_block_bitsL2;
     g_policyL2 = (int)KnobL2Policy.Value();
     g_errorL2 = 0;

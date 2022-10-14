@@ -114,9 +114,13 @@ int cacheFuncL1(unsigned long long data) {
     if(g_policyL1 == 0){
       int randLine = rand() % g_linesL1;
       if(g_cacheL1[setBits][randLine].valid){
-        // IDEALLY WOULD SAVE OVERWRITTEN DATA NOW INTO LOWER MEM
-        // Instead just replace with load request as though reading from
-        // lower mem
+        if(cacheFuncL2(data) == 1){
+          if (g_cacheL1[setBits][randLine].dirty)
+            g_dirty_evictionsL1 += 1;
+          g_missesL1 += 1;
+          g_evictionsL1 += 1;
+          return 3;
+        }
         if (g_cacheL1[setBits][randLine].dirty)
           g_dirty_evictionsL1 += 1;
         g_cacheL1[setBits][randLine].set_b = setBits;
@@ -154,9 +158,13 @@ int cacheFuncL1(unsigned long long data) {
       } else {
           // If no empty blocks use lru to evict
           if (g_cacheL1[setBits][lruInd].valid) {
-              // IDEALLY WOULD SAVE OVERWRITTEN DATA NOW INTO LOWER MEM
-              // Instead just replace with load request as though reading from
-              // lower mem
+              if(cacheFuncL2(data) == 1){
+                if (g_cacheL1[setBits][lruInd].dirty)
+                  g_dirty_evictionsL1 += 1;
+                g_missesL1 += 1;
+                g_evictionsL1 += 1;
+                return 3;
+              }
               if (g_cacheL1[setBits][lruInd].dirty)
                 g_dirty_evictionsL1 += 1;
               g_cacheL1[setBits][lruInd].set_b = setBits;
@@ -179,11 +187,15 @@ int cacheFuncL1(unsigned long long data) {
           // If no empty blocks use lru to evict
           if (plruInd != -1) {
               if(g_cacheL1[setBits][plruInd].valid){
+                if(cacheFuncL2(data) == 1){
+                  if (g_cacheL1[setBits][lruInd].dirty)
+                    g_dirty_evictionsL1 += 1;
+                  g_missesL1 += 1;
+                  g_evictionsL1 += 1;
+                  return 3;
+                }
                 g_evictionsL1 += 1;
               }
-              // IDEALLY WOULD SAVE OVERWRITTEN DATA NOW INTO LOWER MEM
-              // Instead just replace with load request as though reading from
-              // lower mem
               if (g_cacheL1[setBits][plruInd].valid && g_cacheL1[setBits][plruInd].dirty)
                 g_dirty_evictionsL1 += 1;
               g_cacheL1[setBits][plruInd].set_b = setBits;
