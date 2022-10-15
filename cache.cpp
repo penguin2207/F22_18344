@@ -115,10 +115,7 @@ int cacheFuncL1(unsigned long long data) {
       int randLine = rand() % g_linesL1;
       if(g_cacheL1[setBits][randLine].valid){
         if(cacheFuncL2(data) == 1){
-          if (g_cacheL1[setBits][randLine].dirty)
-            g_dirty_evictionsL1 += 1;
           g_missesL1 += 1;
-          g_evictionsL1 += 1;
           return 3;
         }
         if (g_cacheL1[setBits][randLine].dirty)
@@ -159,10 +156,7 @@ int cacheFuncL1(unsigned long long data) {
           // If no empty blocks use lru to evict
           if (g_cacheL1[setBits][lruInd].valid) {
               if(cacheFuncL2(data) == 1){
-                if (g_cacheL1[setBits][lruInd].dirty)
-                  g_dirty_evictionsL1 += 1;
                 g_missesL1 += 1;
-                g_evictionsL1 += 1;
                 return 3;
               }
               if (g_cacheL1[setBits][lruInd].dirty)
@@ -188,13 +182,20 @@ int cacheFuncL1(unsigned long long data) {
           if (plruInd != -1) {
               if(g_cacheL1[setBits][plruInd].valid){
                 if(cacheFuncL2(data) == 1){
-                  if (g_cacheL1[setBits][lruInd].dirty)
-                    g_dirty_evictionsL1 += 1;
                   g_missesL1 += 1;
-                  g_evictionsL1 += 1;
                   return 3;
                 }
                 g_evictionsL1 += 1;
+                if (g_cacheL1[setBits][plruInd].valid && g_cacheL1[setBits][plruInd].dirty)
+                  g_dirty_evictionsL1 += 1;
+                g_cacheL1[setBits][plruInd].set_b = setBits;
+                g_cacheL1[setBits][plruInd].tag_b = tagBits;
+                g_cacheL1[setBits][plruInd].off_b = offBits;
+                g_cacheL1[setBits][plruInd].bitPLRU = true;
+                g_cacheL1[setBits][plruInd].valid = true;
+                g_cacheL1[setBits][plruInd].dirty = g_saveL1;
+                g_missesL1 += 1;
+                return 3;
               }
               if (g_cacheL1[setBits][plruInd].valid && g_cacheL1[setBits][plruInd].dirty)
                 g_dirty_evictionsL1 += 1;
@@ -205,7 +206,7 @@ int cacheFuncL1(unsigned long long data) {
               g_cacheL1[setBits][plruInd].valid = true;
               g_cacheL1[setBits][plruInd].dirty = g_saveL1;
               g_missesL1 += 1;
-              return 3;
+              return 2;
           } else
               return -1;
     }
