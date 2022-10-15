@@ -156,3 +156,7 @@ Setting Up Run Directories
   Setting up 602.gcc_s test base mytest-m64: run_base_test_mytest-m64.0000
 Running Benchmarks
   Running 602.gcc_s test base mytest-m64 threads:4 [2022-10-15 00:08:27]
+Run Complete
+The log for this run is in /tmp/ewirthap-spec/result/CPU2017.011.log
+
+runcpu finished at 2022-10-15 07:33:57; 26734 total seconds elapsed
